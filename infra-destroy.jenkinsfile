@@ -17,7 +17,14 @@ pipeline {
                     }
                 } 
 
-       
+        stage('Terraform Destroy ALB') {
+            steps {
+                git branch: 'main', url: 'https://github.com/sharanyachandu/terraform-loadbalancers.git'
+                        sh "terrafile -f env-${ENV}/Terrafile"
+                        sh "terraform init --backend-config=env-${ENV}/${ENV}-backend.tfvars -reconfigure"
+                        sh "terraform destroy -var-file=env-${ENV}/${ENV}.tfvars -auto-approve"
+                }
+            }
 
         stage('Terraform Destroy Network') {
             steps {
@@ -26,6 +33,6 @@ pipeline {
                         sh "terraform init --backend-config=env-${ENV}/${ENV}-backend.tfvars -reconfigure"
                         sh "terraform destroy -var-file=env-${ENV}/${ENV}.tfvars -auto-approve"
                 }
-            }               
         }
     }
+}
